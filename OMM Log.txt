@@ -1,0 +1,336 @@
+//==| OMM ChangeLog |==========// 
+
+
+--| Eliza sample run from the original code |----- 
+
+  | ELIZA: Hi! I'm Eliza. What is your problem? 
+  | 
+  | USER : I'm an IBM 370 
+  | ELIZA: DID YOU COME TO ME BECAUSE YOU ARE AN IBM 370
+  | 
+  | USER : yes i want a new line printer
+  | ELIZA: WHAT WOULD IT MEAN IF YOU GOT  A NEW LINE PRINTER
+  | 
+  | USER : ABOUT 1200 LPM
+  | ELIZA: SAY, DO YOU HAVE ANY PSYCHOLOGICAL PROBLEMS?
+  | 
+  | USER : HOW WOULD YOU KNOW YOU'RE A SPECRTAVIDEO
+  | ELIZA: WHAT MAKES YOU THINK I AM  A SPECTRAVIDEO
+  | 
+  | USER : IT SAYS SO ABOVE YOUR KEYBOARD
+  | ELIZA: WHY ARE YOU CONCERNED ABOUT MY  KEYBOARD
+  | 
+  | USER : CAUSE THAT IS WHAT I'M TYPING ON
+  | ELIZA: HOW LONG HAVE YOU BEEN TYPING ON
+  | 
+  | USER : SINCE I TYPED RUN
+  | ELIZA: WHAT DOES THAT SUGGEST TO YOU?
+  | 
+  | USER : YOU'RE THE SHRINK
+  | ELIZA: DOES IT PLEASE YOU TO BELIEVE THAT I AM  THE SHRINK
+  | 
+  | USER : DON'T YOU KNOW
+  | ELIZA: WE WERE DISCUSSING YOU-- NOT ME. 
+  | 
+  | USER : I AM BEGINNING TO WONDER ABOUT YOU
+  | ELIZA: DID YOU COME TO ME BECAUSE YOU ARE  BEGINNING TO WONDER ABOUT I
+  | 
+  | USER : I DIDN'T START TO WONDER ABOUT YOU UNTIL AFTER I CAME TO YOU
+
+
+
+--| OMM 0.1.0 |----- 
+
+> New iOS Project!! 
+> JRP: creation of OMM baseline from scratch: 
+
+> july 5, 2015
+
+	> XCode > File > New Project > Single View Application
+		- Product Name: OMM
+		- Organization Name: John Penner
+		- Organization Identifier: ca.theidoctor
+		- Bundle Identifier: ca.theidoctor.OMM
+		- Language: Objective-C
+		- Devices: iPad
+		- Use Core Data: OFF
+	
+	> OMM > Info > General
+		- Identity > Team: John Roland Penner (theidoctor)
+		- Deployment Info > Main Interface: <blank-it-out>
+			- Device Orientation: Landscape Left (OFF); Right (OFF)
+			- App Icons and Launch Images: Launch Screen File <blank-it-out>
+
+		- AppDelegate.m > didFinishLaunchingWithOptions:
+			- self.viewController = [[UIWindow alloc] initWithFrame.. ]; 
+		- Delete: Storyboard; Add > File > UIView > XIB > Interface Builder
+			- Use Auto Layout: OFF (or it will crash!!!)
+
+	> Added: 
+		+ AppDelegate.h
+		+ AppDelegate.m
+		+ ViewController.h
+		+ ViewController.m
+		+ ViewController.xib
+		+ Images (Added folders > Create reference as GROUPS)
+		+ Sounds (Added folders > Create reference as GROUPS)
+
+	> Linked Frameworks and Libraries: 
+		+ CoreMotion.framework
+		+ QuartzCore.framework
+		+ AudioToolbox.framework
+		+ UIKit.framework
+		+ Foundation.framework
+		+ CoreGraphics.framework
+		
+	> JRP: ViewController.xib > File's Owner > Identity Inspector
+		- Custom Class: Class: UIViewController (wrong); 
+		  it should be set to: ViewController (done). 
+		- open xib file > right click: files owner > drag 
+			to your root view; OUTLETS > VIEW. 
+		* DO THIS OR IT WILL CRASH!! with Loaded nib, 
+		but view outlet was not set. 
+
+	> JRP: in the AppDelegate.h, AFTER: #import <UIKit..>, and 
+	BEFORE: @class ViewController, put in: #import "ViewController.h";
+	ALSO ADD: @property (strong, nonatomic) ViewController *viewController;
+
+	> JRP: Repeated Crashing on Launch -- WTF!?
+		> Solution: 
+		- Info.plist > Remove Main storyboard base filename key: 
+		- Storyboard: MAIN.xib  [DELETED!!!]
+	
+	> JRP: info.plist > added KEY: 
+		+ View controller-based status bar appearance: (BOOL) NO
+
+	> JRP: Product > Clean. 
+	
+	> JRP: application compiles, and displays background image. 
+		- HELLO WORLD. :-D
+
+
+> july 6, 2015
+	> JRP: couldnt get UILabels to accept text input.. 3hrs.. DUH! 
+		STUPIDO -- UILabels do not work, one must declare UITextField,
+		and then when you wire in you: FILES OWNER > Connections Inspector,
+		and wire up to the IBOutlet in the ViewController.h. works fine. :-|
+
+	> JRP: to get text input, in the .h where one declares the ViewController
+		as a subclass of :UIViewController <UITextFieldDelegate> must be added!
+		then, make the TextField the FIRST RESPONDER: 
+		[uiLayerView addSubview:textInput];
+		[textInput becomeFirstResponder];
+
+	> JRP: in the touchesEnded method, we test the touchRange, 
+		and dismiss the keyboard with an explicit cast in order
+		to address it persistently by its tag: 
+		[(UITextField *)[self.view viewWithTag:123] resignFirstResponder];
+
+	> JRP: added Sounds and Speech
+		- added playSound: 
+		- added speak: 
+		+ now it beeps and squeeks. 
+
+
+--| OMM 0.1.1 |----- 
+
+> july 7, 2015
+	> JRP: wrote initial objectiveC versions of programme declarations: 
+	+ initialization
+		+ N1=36 keywords; N2=12 conjugations; N3=112 replies
+		+ S[36] = {1, 4, 6, 6.. }
+		+ R[36] = {1, 4, 6, 6.. }
+		+ N[36] = {3, 5, 9, 9.. }
+	+ findKeyword()
+		+ NSArray *keywords[36]; 
+		+ K$ = [keywords objectAtIndex:K];
+	+ conjugation()
+		+ NSArray *sConjugate[12];
+		+ NSArray *rConjugate[12];
+		+ S$ = [sConjugate objectAtIndex:X];
+		+ R$ = [rConjugate objectAtIndex:X]
+	+ formReply()
+		+ NSArray *replies[112];
+		+ F$ = [replies objectAtIndex:R(K)];
+
+july 10, 2015
+	> JRP: declaring INT array[] in objectiveC is a pain!! 
+	NSArray *S = [[NSArray alloc] initWithObjects: @[ @(1), @(4) ], nil];
+	
+	> JRP: added properties and synthesized class variables. 
+	it now compiles with all variables and NSArrays[] initialized. :-)
+
+july 15, 2015
+	> JRP: get findKeyword: method working..
+		must deconvolute GOTOs.. ugh. 
+
+july 20, 2015
+	> JRP: declaring an instance variable which contains an NSArray 
+	of INTEGERS is a !@$% pain, and we only actually use them in the 
+	getReply method, so instead of declaring R[112] as an NSArray: 
+	NSArray *RR = [[NSArray alloc] initWithObjects: 
+		@[ @(1), @(4),.. @(99), @(106) ], nil];
+	
+	and retrieving values with this piece of GUNK: 
+	NSInteger replyIndex = [(NSNumber *)[RR objectAtIndex:ss] intValue];
+	// convert [NSNumber integerValue] returns NSInteger
+	// convert [NSNumber intValue] returns int
+
+	phooey! now i see why apple made SWIFT > to get rid of such crud. :-p
+	
+	no more!! -- now, we declare arrays the old fashioned (C++) way with: 
+	  NSInteger RR[112] = {1, 4,.. 99, 106};
+	locally within the method, and recall it with: 
+	  NSInteger replyIndex = RR[ss];
+	
+	> JRP: we are now correctly finding keywords, and returning 
+	the position of the keyword in the inputStr, and returning 
+	phrases based off the RR[] index of keywords: 
+	
+	| OMM[] inputStr: can you do this
+	| OMM[] -->found: can you ss:1 tt:1 
+	| OMM[] ss: 1
+	| OMM[] replyIndex: 4
+	| OMM[] replyString: Do you want to be able to*
+
+	> JRP: notice in the following example it finds 'no' in 'now',
+	which means the search is working, but we need to match WORDS(!!)
+	
+	| OMM[] is it working now?
+	| OMM[] -->found: no ss:27 tt:15 
+	| OMM[] kk: 27
+	| OMM[] replyRR: 69
+	| OMM[] replyString: Why not?
+
+
+--| OMM 0.2.0 |----- 
+
+july 21, 2015
+	> JRP: the local declaration of INT[] arrays works great,
+	except the increments to the answers in RR[] need to persist,
+	and thus we are forced back to declaring an NSArray iVAR, 
+	which doesnt seem to return NSIntegers.. i've come across 
+	the following C++ hack..  heh heh. 
+	
+	/* santhu Jan 20.2014 at 8:05
+	| In your .m file add it after: 
+	|
+	| @interface MyClass ()
+	| @end
+	| 
+	| @implementation MyClass {
+	| }
+	| int a[] = {1, 2, 34};
+	| 
+	| - (void) init {...
+	| 
+	| Try NSLog(@"%d", a[1]) and it works perfectly. 
+	*/
+	
+	> JRP: the original version used arrays with 1 ordinals. 
+	NSArray can provide 1ordinals by defining element0 = @"", 
+	NSIntegers use 0ordinals -- so we need to address replies thus: 
+	NSString *replyString = [replies objectAtIndex:RR[kk-1]]
+	in the reply lookup, or suffer off-by-one errors. 
+	we can now process a reply string.. :-D
+	
+	| OMM[] can you do it
+	| OMM[] -->found: can you ss:1 tt:1 
+	| OMM[] kk: 1
+	| OMM[] replyRR: 1
+	| OMM[] replyString: Don't you believe that I can*
+	
+	> JRP: replies now persist and increment as they are 
+	consecutively called; they also rollover in modulo. 
+
+
+--| OMM 0.3.0 |----- 
+
+july 22, 2015
+	> JRP: working on conjugation. 
+	we can now extract CStr. 
+	we do not yet conjugate. 
+	
+	| OMM[] User: how can you do this
+	| OMM[] Keyword: can you ss:1 tt:5
+	| OMM[] CStr (12..9 in 21):  do this 
+	| OMM[] RR[1] = 1: Don't you believe that I can*
+
+
+july 25, 2015
+	> JRP: conjugation; first implementation crashes with
+	index range errs. 
+
+july 26, 2015
+	> JRP: we now test if the reply ends with *
+	and suffix the conjugation to the replyStr if TRUE. 
+	
+	| OMM[] User: why dont you think you can do it
+	| OMM[] Keyword: why dont you ss:7 tt:1
+	| OMM[] CStr (13..21 in 34):  think you can do it 
+	| OMM[] RR[7] = 17: Do you really believe I don't*
+	| OMM[] Eliza: Do you really believe I don't think you can do it 
+	
+	> JRP: conjugations are still not functioning (I-ME ARE-AM WERE-WAS)
+	as is apparent from the following: 
+
+	| OMM[] User: I'm so excited to see you 
+	| OMM[] Keyword: Im  ss:12 tt:1 
+	| OMM[] CStr (4..23 in 27): so excited to see you 
+	| OMM[] RR[12] = 28: Did you come to me because you are*
+	| OMM[] Eliza: Did you come to me because you are so excited to see you  
+
+	> JRP: graphically toned down the text field so it no longer covers 
+	the face and uses a deep grey background colour with a slimmer text 
+	entry area. 
+
+july 27, 2015
+	> JRP: we did not include an I-ME conjugate, so i found an updated
+	list of conjugates -- which are not yet applied, but which we should 
+	implement as soon as the code is functional: 
+
+	// {are, am, were, was, you, I, your, my, Ive, youve, Im, youre, me, you }
+	// {am, are, was, were, me, you, my, your, youve, Ive, youre, Im, you, me }
+
+	> JRP: killed some of the substringWithRange:NSMakeRange() Errors. 
+	we can now extract looping SStr and RStr conjugates. now we need 
+	to selectively replace found conjugates. 
+
+
+--| OMM 0.4.0 |----- 
+
+august 15, 2015
+	> JRP: got the conjugate process working.. oh yeah. :-}
+
+	> JRP: conjugation was working so good, I replaced the original 12
+	conjugates with updated 28 conjugates -- returns more natural results. 
+	
+	| OMM[] User: Im beginning to wonder about you too
+	| OMM[] Keyword: Im  ss:12 tt:1 
+	| OMM[] CStr (4..34 in 38): beginning to wonder about you too 
+	| OMM[] --SStr[0]:  are  | RStr[0]:  am 
+	| OMM[] --SStr[1]:  am  | RStr[1]:  are 
+	| OMM[] --SStr[2]:  were  | RStr[2]:  was 
+	| OMM[] --SStr[3]:  was  | RStr[3]:  were 
+	| OMM[] --SStr[4]:  you  | RStr[4]:  me 
+	| OMM[]   SLoc: 25 | SLen: 5 | CLen: 34
+	| OMM[] Conjugate pieces: beginning to wonder about |  you  >  me  | too 
+	| OMM[] RR[12] = 29: How long have you been*
+	| OMM[] Eliza: How long have you been beginning to wonder about me too 
+
+
+--| February 27, 2025 |----- 
+
+> Building with XCode 16.2 on macOS Sequoia 15.2
+
+	> Error: SDK does not contain 'libarclite' at the path
+	- Solution: Increase Minimum Deployment Target (also Tests) —> from 7.0 to 15.0
+
+> Preparing for Upload to GitHib
+	🖼️ iconic image of christ by hans memling is a THX-1138 reference — what's wrong? 
+	ELIZA ported to Objective-C for iOS by John Roland Penner 2015
+	BASIC version by Jeff Shrager 1973; published Creative Computing 1977
+	
+	https://github.com/johnrpenner/Eliza-OMM.git	
+
+
